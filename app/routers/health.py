@@ -2,17 +2,21 @@ from fastapi import FastAPI, Header, Request, APIRouter
 from typing import Optional
 import base64
 import json
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
 
-# Configurer Jinja2 pour le rendu des templates
-templates = Jinja2Templates(directory="app/templates")
-
-@router.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+# Page d'accueil personnalisée
+@router.get("/")
+async def read_root():
+    return {
+        "message": "Welcome to the Climbing Profiles & Routes API 🧗‍♂️🧗‍♀️",
+        "description": "Explore climber profiles and epic climbing routes from around the world!",
+        "endpoints": {
+            "/api": "Basic Hello API",
+            "/health": "API Health Check",
+            "/api/headers": "Decode custom headers"
+        }
+    }
 
 
 @router.get("/api")

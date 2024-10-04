@@ -6,25 +6,42 @@ networks:
 
 services:
   api:
-    build: .
+    build: ./app                     # Build à partir du Dockerfile dans le dossier app
     networks:
       - default
     volumes:
-      - ./app/:/app
-    command: ["sh", "-c", "python /app/init_db.py && uvicorn main:app --host 0.0.0.0 --port 5000 --reload"]
+      - ./app:/app                   # Monter les fichiers locaux pour le développement
     ports:
-      - "5000:5000"
+      - "5000:5000"                  # Expose le port 5000 pour l'API
     env_file:
-      - .env
+      - .env                         # Fichier d'environnement pour FastAPI
     depends_on:
-      - db
+      - db                           # L'API dépend de la base de données
+    restart: always
 
   db:
-    image: postgres
+    image: postgres                  # Utilise l'image officielle PostgreSQL
     restart: always
     env_file:
-      - .env
+      - .env                         # Fichier d'environnement pour la base de données
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5432:5432"                  # Expose le port 5432 pour PostgreSQL
     networks:
       - default
+
+  frontend:
+    build: ./frontend                # Build à partir du Dockerfile dans le dossier frontend
+    networks:
+      - default
+    volumes:
+      - ./frontend:/app              # Monter les fichiers locaux pour le développement
+    ports:
+      - "3000:3000"                  # Expose le port 3000 pour l'application React
+    depends_on:
+      - api                          # Le frontend dépend de l'API
+    restart: always
+
+volumes:
+  postgres_data:                     # Volume pour persister les données de la base
