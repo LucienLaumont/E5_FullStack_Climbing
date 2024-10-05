@@ -1,38 +1,47 @@
-.App {
-  text-align: center;
+@font-face {
+  font-family: 'Gliker';
+  src: url('./assets/fonts/Gliker.ttf') format('truetype'); /* Assure-toi que le chemin est correct */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  font-family: 'Gliker', sans-serif; /* Applique la police au corps entier */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Image en plein écran */
+.full-screen-image {
+  width: 100vw;
+  height: 99vh;
+  object-fit: cover;
+  position: relative; /* Garde l'image visible */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Conteneur des boutons superposés */
+.overlay {
+  position: absolute;
+  top: 35vh;
+  left: 36vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 3vh; /* Espace entre les boutons */
+  z-index: 1; /* Place les boutons au-dessus de l'image */
+}
+
+/* Boutons cliquables */
+.clickable-block {
+  width: 22vw;
+  height: 16vh;
+  background-color: #226d68; /* Fond semi-transparent */
   color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none; /* Retire le soulignement des liens */
+  border-radius: 4vh;
+  font-size: 3vh;
+  font-family: 'Gliker', sans-serif; /* Applique la police Gliker aux textes des boutons */
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.clickable-block:hover {
+  background-color: #668170; /* Change de couleur au survol */
 }
