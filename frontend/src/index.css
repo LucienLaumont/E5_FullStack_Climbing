@@ -1,0 +1,14 @@
+/* index.css */
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #343541; /* Fond gris sur toute la page */
+  height: 100%;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}

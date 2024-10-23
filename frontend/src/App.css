@@ -1,0 +1,127 @@
+@font-face {
+  font-family: 'Gliker';
+  src: url('./assets/fonts/Gliker.ttf') format('truetype'); /* Assure-toi que le chemin est correct */
+}
+
+body {
+  font-family: 'Gliker', sans-serif; /* Applique la police au corps entier */
+}
+
+/* Image en plein écran */
+.full-screen-image {
+  width: 100vw;
+  height: 99vh;
+  object-fit: cover;
+  position: relative; /* Garde l'image visible */
+}
+
+/* Conteneur des boutons superposés */
+.overlay {
+  position: absolute;
+  top: 35vh;
+  left: 36vw;
+  display: flex;
+  flex-direction: column;
+  gap: 3vh; /* Espace entre les boutons */
+  z-index: 1; /* Place les boutons au-dessus de l'image */
+}
+
+/* Boutons cliquables */
+.clickable-block {
+  width: 22vw;
+  height: 16vh;
+  background-color: #226d68; /* Fond semi-transparent */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none; /* Retire le soulignement des liens */
+  border-radius: 4vh;
+  font-size: 3vh;
+  font-family: 'Gliker', sans-serif; /* Applique la police Gliker aux textes des boutons */
+}
+
+.clickable-block:hover {
+  background-color: #668170; /* Change de couleur au survol */
+}
+
+/*************** PAGE DASHBOARD **************************/
+
+/* Styles généraux pour le tableau de bord */
+.dashboard {
+  position: relative; /* Point d'ancrage pour les éléments enfants */
+  width: 100vw; /* Assure que le conteneur prenne la largeur complète de la page */
+  height: 100vh; /* Assure que le conteneur prenne toute la hauteur de la page */
+  background-color: #f0f0f0; /* Optionnel : Couleur de fond pour visualiser la zone */
+}
+
+/* Style général pour chaque bloc */
+.dashboard-block {
+  position: absolute; /* Positionnement relatif à la div dashboard */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  text-align: center;
+}
+
+/* Styles spécifiques pour chaque bloc */
+.block1 {
+  background-color: #FF5733;
+  top: 2vh; /* Position en haut à gauche */
+  left: 2vw;
+  width: 96vw;
+  height: 12vh;
+}
+
+.block2 {
+  background-color: #33B5FF;
+  flex-direction: column;
+  top: 16vh; /* Position en haut avec un décalage sur la gauche */
+  left: 2vw; /* 300px de large + 20px de marge + un petit décalage */
+  width: 30vw;
+  height: 40vh;
+}
+
+.block3 {
+  background-color: #FF33C4;
+  top: 58vh; /* Position en haut avec un décalage sur la gauche */
+  left: 2vw; /* 300px de large + 20px de marge + un petit décalage */
+  width: 30vw;
+  height: 40vh;
+}
+
+.block4 {
+  background-color: #33FF6B;
+  top: 16vh; /* Position en haut avec un décalage sur la gauche */
+  left: 34vw; /* 300px de large + 20px de marge + un petit décalage */
+  width: 20vw;
+  height: 40vh;
+}
+
+.block5 {
+  background-color: #FF8C33;
+  top: 16vh; /* Position en haut avec un décalage sur la gauche */
+  left: 56vw; /* 300px de large + 20px de marge + un petit décalage */
+  width: 20vw;
+  height: 40vh;
+}
+
+.block6 {
+  background-color: #B833FF;
+  top: 16vh; /* Position en haut avec un décalage sur la gauche */
+  left: 78vw; /* 300px de large + 20px de marge + un petit décalage */
+  width: 20vw;
+  height: 40vh;
+}
+
+.block7 {
+  background-color: #fff133;
+  top: 58vh; /* Position en haut avec un décalage sur la gauche */
+  left: 34vw; /* 300px de large + 20px de marge + un petit décalage */
+  width: 64vw;
+  height: 40vh;
+}
