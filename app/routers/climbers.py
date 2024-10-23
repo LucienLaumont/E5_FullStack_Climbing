@@ -1,19 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 import schemas
 from models import get_db
 import services.climbers as climber_service
 
 router = APIRouter()
 
+security = HTTPBearer()
+
 @router.get("/climbers/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_all_climbers(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+async def get_all_climbers(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """Endpoint pour obtenir tous les grimpeurs avec pagination."""
     return climber_service.get_all_climbers(db, skip=skip, limit=limit)
 
 @router.get("/climbers/{climber_id}", response_model=schemas.Climber, tags=["Climbers"])
-def get_climber_by_id(climber_id: int, db: Session = Depends(get_db)):
+async def get_climber_by_id(climber_id: int, db: Session = Depends(get_db)):
     """Endpoint pour obtenir un grimpeur par ID."""
     climber = climber_service.get_climber_by_id(db, climber_id)
     if not climber:
@@ -21,12 +24,12 @@ def get_climber_by_id(climber_id: int, db: Session = Depends(get_db)):
     return climber
 
 @router.post("/climbers/", response_model=schemas.Climber, tags=["Climbers"])
-def create_climber(climber: schemas.ClimberCreate, db: Session = Depends(get_db)):
+async def create_climber(climber: schemas.Climber, db: Session = Depends(get_db)):
     """Endpoint pour ajouter un nouveau grimpeur."""
     return climber_service.create_climber(db, climber)
 
 @router.put("/climbers/{climber_id}", response_model=schemas.Climber, tags=["Climbers"])
-def update_climber(climber_id: int, updated_data: schemas.ClimberCreate, db: Session = Depends(get_db)):
+async def update_climber(climber_id: int, updated_data: schemas.Climber, db: Session = Depends(get_db)):
     """Endpoint pour mettre à jour un grimpeur existant."""
     climber = climber_service.update_climber(db, climber_id, updated_data)
     if not climber:
@@ -34,43 +37,53 @@ def update_climber(climber_id: int, updated_data: schemas.ClimberCreate, db: Ses
     return climber
 
 @router.delete("/climbers/{climber_id}", response_model=dict, tags=["Climbers"])
-def delete_climber(climber_id: int, db: Session = Depends(get_db)):
+async def delete_climber(climber_id: int, db: Session = Depends(get_db)):
     """Endpoint pour supprimer un grimpeur."""
     if climber_service.delete_climber(db, climber_id):
         return {"message": "Climber deleted successfully"}
     raise HTTPException(status_code=404, detail="Climber not found")
 
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
 @router.get("/climbers/countries/", response_model=List[str], tags=["Climbers"])
-def get_countries(db: Session = Depends(get_db)):
+async def get_countries(db: Session = Depends(get_db)):
     """Endpoint pour obtenir la liste des pays avec des grimpeurs."""
     return climber_service.get_country(db)
 
-@router.get("/climbers/countries/{country_name}", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_climbers_by_country(country_name: str, db: Session = Depends(get_db)):
-    """Endpoint pour obtenir les grimpeurs originaires d'un pays spécifique."""
-    return climber_service.get_climbers_by_country(country_name, db)
+@router.get("/climbers/filter_by_sex/", response_model=List[schemas.Climber], tags=["Climbers"])
+async def get_climbers_by_sex(sex: int, db: Session = Depends(get_db)):
+    """Endpoint pour obtenir tous les grimpeurs filtrés par sexe."""
+    return climber_service.get_climbers_by_sex(db, sex)
 
-@router.get("/climbers/count_by_country/", response_model=List[dict], tags=["Climbers"])
-def get_climbers_count_by_country(db: Session = Depends(get_db)):
-    """Endpoint pour obtenir le nombre de grimpeurs par pays."""
-    return climber_service.get_climbers_count_by_country(db)
+@router.get("/climbers/filter_experience/", response_model=List[schemas.Climber], tags=["Climbers"])
+async def get_climbers_by_years_climbing(min_years: int = 0, max_years: int = 5, db: Session = Depends(get_db)):
+    """Endpoint pour obtenir tous les grimpeurs filtrés par leur niveau d'expérience."""
+    return climber_service.get_climbers_by_years_climbing(db, min_years,max_years)
 
-@router.get("/climbers/youngest/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_youngest_climbers(limit: int = 10, db: Session = Depends(get_db)):
-    """Endpoint pour obtenir les grimpeurs les plus jeunes."""
-    return climber_service.get_youngest_climbers(db, limit=limit)
+@router.get("/climbers/by_country/", response_model=List[schemas.Climber], tags=["Climbers"])
+async def get_climbers_by_country(country: str = "FRA", db: Session = Depends(get_db)):
+    """Endpoint pour obtenir les grimpeurs venant d'un pays particulier (par défaut 'FRA')."""
+    return climber_service.get_climbers_by_country(db, country)
 
-@router.get("/climbers/oldest/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_oldest_climbers(limit: int = 10, db: Session = Depends(get_db)):
-    """Endpoint pour obtenir les grimpeurs les plus âgés."""
-    return climber_service.get_oldest_climbers(db, limit=limit)
+@router.get("/climbers/filter_height/", response_model=List[schemas.Climber], tags=["Climbers"])
+async def get_climbers_by_height(min_height: float = 190, max_height: float = 200, db: Session = Depends(get_db)):
+    """Endpoint pour obtenir les grimpeurs filtrés par leur taille."""
+    return climber_service.get_climbers_by_height(db, min_height, max_height)
 
-@router.get("/climbers/tallest/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_tallest_climbers(limit: int = 10, db: Session = Depends(get_db)):
-    """Endpoint pour obtenir les grimpeurs les plus grands."""
-    return climber_service.get_tallest_climbers(db, limit=limit)
+@router.get("/climbers/filter_weight/", response_model=List[schemas.Climber], tags=["Climbers"])
+async def get_climbers_by_weight(min_weight: float = 90, max_weight: float = 100, db: Session = Depends(get_db)):
+    """Endpoint pour obtenir les grimpeurs filtrés par leur poids."""
+    return climber_service.get_climbers_by_weight(db, min_weight, max_weight)
 
-@router.get("/climbers/shortest/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_shortest_climbers(limit: int = 10, db: Session = Depends(get_db)):
-    """Endpoint pour obtenir les grimpeurs les plus petits."""
-    return climber_service.get_shortest_climbers(db, limit=limit)
+@router.get("/climbers/filter_age/", response_model=List[schemas.Climber], tags=["Climbers"])
+def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depends(get_db)):
+    """Endpoint pour obtenir les grimpeurs filtrés par leur âge."""
+    return climber_service.get_climbers_by_age(db, min_age, max_age)
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
+

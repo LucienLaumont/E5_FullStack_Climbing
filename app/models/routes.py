@@ -14,3 +14,6 @@ class Route(BaseSQL):
     cluster = Column(Integer, nullable=False)
     rating_tot = Column(Float, nullable=False)
 
+    class Config:
+        orm_mode = True
+
