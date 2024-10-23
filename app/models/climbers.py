@@ -22,4 +22,7 @@ class Climber(BaseSQL):
     year_first = Column(Integer, nullable=False)
     year_last = Column(Integer, nullable=False)
 
+    class Config:
+        orm_mode = True
+
 

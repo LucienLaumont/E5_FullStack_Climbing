@@ -6,3 +6,4 @@ pydantic
 alembic
 starlette_exporter
 pandas
+pyjwt
