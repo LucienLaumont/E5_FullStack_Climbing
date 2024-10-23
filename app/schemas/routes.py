@@ -3,6 +3,7 @@ from typing import Optional
 
 # Schéma de base pour les routes (voies d'escalade)
 class RouteBase(BaseModel):
+    name_id: int 
     country: str
     crag: str  # Site d'escalade
     sector: str  # Secteur d'escalade
@@ -14,11 +15,11 @@ class RouteBase(BaseModel):
 
 # Schéma pour la création d'une nouvelle route
 class RouteCreate(RouteBase):
-    pass
+    user_id: int
 
 # Schéma pour la réponse avec l'ID de la route
 class Route(RouteBase):
-    name_id: int  # Identifiant de la voie
+    user_id: int
 
     class Config:
         orm_mode = True

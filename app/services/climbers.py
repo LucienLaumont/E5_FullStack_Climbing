@@ -11,9 +11,9 @@ def get_all_climbers(db: Session, skip: int = 0, limit: int = 10) -> List[models
     records = db.query(models.Climber).offset(skip).limit(limit).all()
     return records
 
-def get_climber_by_id(db: Session, user_id: int) -> models.Climber:
+def get_climber_by_id(db: Session, climber_id: int) -> models.Climber:
     """Obtenir une route par son identifiant (name_id)."""
-    record = db.query(models.Climber).filter(models.Climber.user_id == user_id).first()
+    record = db.query(models.Climber).filter(models.Climber.climber_id == climber_id).first()
     return record
 
 def create_climber(db: Session, climber: schemas.Climber) -> models.Climber:
@@ -26,7 +26,7 @@ def create_climber(db: Session, climber: schemas.Climber) -> models.Climber:
 
 def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) -> models.Climber:
     """Mettre à jour un grimpeur existant dans la base de données."""
-    db_climber = db.query(models.Climber).filter(models.Climber.user_id == climber_id).first()
+    db_climber = db.query(models.Climber).filter(models.Climber.climber_id == climber_id).first()
 
     if db_climber:
         updated_data_dict = updated_data.dict(exclude_unset=True)  # Seuls les champs avec des valeurs
@@ -41,14 +41,14 @@ def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) 
 
 def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) -> models.Climber:
     """Mettre à jour un grimpeur existant en une seule ligne."""
-    db.query(models.Climber).filter(models.Climber.user_id == climber_id).update(updated_data.dict(exclude_unset=True))
+    db.query(models.Climber).filter(models.Climber.climber_id == climber_id).update(updated_data.dict(exclude_unset=True))
     db.commit()
-    db_climber = db.query(models.Climber).filter(models.Climber.user_id == climber_id).first()
+    db_climber = db.query(models.Climber).filter(models.Climber.climber_id == climber_id).first()
     return db_climber
 
 def delete_climber(db: Session, user_id: int) -> bool:
     """Supprimer une route de la base de données."""
-    db_user = db.query(models.Climber).filter(models.Climber.user_id == user_id).first()
+    db_user = db.query(models.Climber).filter(models.Climber.climber_id == user_id).first()
 
     if db_user:
         db.delete(db_user)

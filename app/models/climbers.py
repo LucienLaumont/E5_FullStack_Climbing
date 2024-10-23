@@ -1,11 +1,13 @@
-from sqlalchemy import Column, String, Integer, DateTime, Float
+from sqlalchemy import Column, String, Integer, DateTime, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 from database import BaseSQL
 
 class Climber(BaseSQL):
 
     __tablename__ = "climbers"
 
-    user_id = Column(Integer, primary_key=True, index=True)
+    climber_id = Column(Integer, primary_key=True, index=True)
     country = Column(String, nullable=False)
     sex = Column(Integer, nullable=False)
     height = Column(Float, nullable=False)
@@ -22,7 +24,11 @@ class Climber(BaseSQL):
     year_first = Column(Integer, nullable=False)
     year_last = Column(Integer, nullable=False)
 
+    # Clé étrangère qui fait référence à la table users
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
+
+    # Définir la relation avec le modèle User
+    user = relationship("User", back_populates="climbers")
+
     class Config:
         orm_mode = True
-
-

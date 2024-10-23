@@ -1,4 +1,6 @@
-from sqlalchemy import Column, String, Integer, Float
+from sqlalchemy import Column, String, Integer, DateTime, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 from database import BaseSQL
 
 class Route(BaseSQL):
@@ -13,7 +15,11 @@ class Route(BaseSQL):
     grade_mean = Column(Float, nullable=False)
     cluster = Column(Integer, nullable=False)
     rating_tot = Column(Float, nullable=False)
+    # Clé étrangère qui fait référence à la table users
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
 
+    # Définir la relation avec le modèle User
+    user = relationship("User", back_populates="routes")
     class Config:
         orm_mode = True
 

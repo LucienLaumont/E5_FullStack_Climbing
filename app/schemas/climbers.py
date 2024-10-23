@@ -4,6 +4,7 @@ from datetime import datetime
 
 # Schéma pour les données de grimpeurs (Climbers)
 class ClimberBase(BaseModel):
+    climber_id: int
     country: str
     sex: int
     height: float
@@ -22,11 +23,11 @@ class ClimberBase(BaseModel):
 
 # Schéma pour la création de grimpeurs
 class ClimberCreate(ClimberBase):
-    pass
+    user_id: int
 
 # Schéma pour la réponse avec l'ID de l'utilisateur
 class Climber(ClimberBase):
     user_id: int
-
+    
     class Config:
         orm_mode = True

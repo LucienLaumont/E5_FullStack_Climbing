@@ -1,9 +1,9 @@
-import json
 import pandas as pd
 from sqlalchemy.orm import Session
 from database import SessionLocal, BaseSQL, engine
-from models import Climber, Route
+from models import Climber, User, Route
 from schemas import climbers, routes
+import uuid
 
 # Fonction pour initialiser la base de données
 def init_db():
@@ -14,15 +14,28 @@ def init_db():
     db: Session = SessionLocal()
 
     try:
+        # Charger les données des utilisateurs depuis le fichier CSV généré
+        user_data = pd.read_csv('data/simple_users_generated.csv')  # Chemin vers votre fichier CSV généré
+
+        # Ajouter les utilisateurs à la base de données
+        users = []
+        for _, row in user_data.iterrows():
+            user = User(
+                username=row['username'],
+                password=row['password']  # Mot de passe simple
+            )
+            db.add(user)
+            db.commit()  # Commit chaque utilisateur pour générer leur ID
+            users.append(user)
+
         # Charger les données des grimpeurs
         climber_data = pd.read_csv('data/climber_df.csv')
-        # Charger les données des routes
-        route_data = pd.read_csv('data/routes_rated.csv')
 
-        # Ajouter les grimpeurs à la base de données
-        for _, row in climber_data.iterrows():
+        # Associer chaque grimpeur à un utilisateur existant (aléatoirement ici)
+        for i, row in climber_data.iterrows():
+            user = users[i % len(users)]  # Associer un utilisateur cycliquement
             climber = Climber(
-                user_id=row['user_id'],
+                climber_id=row['user_id'],
                 country=row['country'],
                 sex=row['sex'],
                 height=row['height'],
@@ -37,12 +50,17 @@ def init_db():
                 grades_max=row['grades_max'],
                 grades_mean=row['grades_mean'],
                 year_first=row['year_first'],
-                year_last=row['year_last']
+                year_last=row['year_last'],
+                user_id=user.id  # Associer l'utilisateur au grimpeur
             )
             db.add(climber)
 
+        # Charger les données des routes
+        route_data = pd.read_csv('data/routes_rated.csv')
+
         # Ajouter les routes à la base de données
         for _, row in route_data.iterrows():
+            user = users[i % len(users)]  # Associer un utilisateur cycliquement
             route = Route(
                 name_id=row['name_id'],
                 country=row['country'],
@@ -52,7 +70,8 @@ def init_db():
                 tall_recommend_sum=row['tall_recommend_sum'],
                 grade_mean=row['grade_mean'],
                 cluster=row['cluster'],
-                rating_tot=row['rating_tot']
+                rating_tot=row['rating_tot'],
+                user_id=user.id  # Associer l'utilisateur au grimpeur
             )
             db.add(route)
 
