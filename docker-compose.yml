@@ -6,42 +6,43 @@ networks:
 
 services:
   api:
-    build: ./app                     # Build à partir du Dockerfile dans le dossier app
+    build: ./app
     networks:
       - default
     volumes:
-      - ./app:/app                   # Monter les fichiers locaux pour le développement
+      - ./app:/app
     ports:
-      - "5000:5000"                  # Expose le port 5000 pour l'API
+      - "5000:5000"
     env_file:
-      - .env                         # Fichier d'environnement pour FastAPI
+      - .env
     depends_on:
-      - db                           # L'API dépend de la base de données
+      - db
     restart: always
 
   db:
-    image: postgres                  # Utilise l'image officielle PostgreSQL
+    image: postgres
     restart: always
     env_file:
-      - .env                         # Fichier d'environnement pour la base de données
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"                  # Expose le port 5432 pour PostgreSQL
+      - "5432:5432"
     networks:
       - default
 
   frontend:
-    build: ./frontend                # Build à partir du Dockerfile dans le dossier frontend
+    build: ./frontend
     networks:
       - default
     volumes:
-      - ./frontend:/app              # Monter les fichiers locaux pour le développement
+      - ./frontend:/app               # Monter les fichiers locaux pour le développement
+      - /app/node_modules              # Volume séparé pour node_modules
     ports:
-      - "3000:3000"                  # Expose le port 3000 pour l'application React
+      - "3000:3000"
     depends_on:
-      - api                          # Le frontend dépend de l'API
+      - api
     restart: always
 
 volumes:
-  postgres_data:                     # Volume pour persister les données de la base
+  postgres_data:
