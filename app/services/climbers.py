@@ -25,21 +25,6 @@ def create_climber(db: Session, climber: schemas.Climber) -> models.Climber:
     return db_climber
 
 def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) -> models.Climber:
-    """Mettre à jour un grimpeur existant dans la base de données."""
-    db_climber = db.query(models.Climber).filter(models.Climber.climber_id == climber_id).first()
-
-    if db_climber:
-        updated_data_dict = updated_data.dict(exclude_unset=True)  # Seuls les champs avec des valeurs
-        for key, value in updated_data_dict.items():
-            setattr(db_climber, key, value)  # Met à jour chaque attribut de manière dynamique
-        
-        db.commit()
-        db.refresh(db_climber)
-        return db_climber
-    else:
-        return None
-
-def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) -> models.Climber:
     """Mettre à jour un grimpeur existant en une seule ligne."""
     db.query(models.Climber).filter(models.Climber.climber_id == climber_id).update(updated_data.dict(exclude_unset=True))
     db.commit()

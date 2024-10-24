@@ -6,10 +6,10 @@ from schemas.auth_token import AuthToken
 from schemas.users import User
 from services.auth import generate_access_token
 
-auth_router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth")
 
 
-@auth_router.post("/token", tags=["auth"])
+@router.post("/token", tags=["auth"])
 async def get_access_token(
     user_login: User,
     db: Session = Depends(models.get_db),

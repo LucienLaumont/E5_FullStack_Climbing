@@ -5,6 +5,8 @@ from typing import List, Optional
 import schemas
 from models import get_db
 import services.climbers as climber_service
+from starlette.requests import Request
+from routers.utils import verify_autorization_header
 
 router = APIRouter()
 
@@ -23,22 +25,31 @@ async def get_climber_by_id(climber_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Climber not found")
     return climber
 
-@router.post("/climbers/", response_model=schemas.Climber, tags=["Climbers"])
-async def create_climber(climber: schemas.Climber, db: Session = Depends(get_db)):
+@router.post("/climbers/",dependencies=[Depends(security)], response_model=schemas.Climber, tags=["Climbers"])
+async def create_climber(request: Request, climber: schemas.Climber, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
+    user_id = token.get("user_id")
     """Endpoint pour ajouter un nouveau grimpeur."""
     return climber_service.create_climber(db, climber)
 
-@router.put("/climbers/{climber_id}", response_model=schemas.Climber, tags=["Climbers"])
-async def update_climber(climber_id: int, updated_data: schemas.Climber, db: Session = Depends(get_db)):
+@router.put("/climbers/{climber_id}",dependencies=[Depends(security)], response_model=schemas.Climber, tags=["Climbers"])
+async def update_climber(request: Request, climber_id: int, updated_data: schemas.Climber, db: Session = Depends(get_db)):
     """Endpoint pour mettre à jour un grimpeur existant."""
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
+    user_id = token.get("user_id")
     climber = climber_service.update_climber(db, climber_id, updated_data)
     if not climber:
         raise HTTPException(status_code=404, detail="Climber not found")
     return climber
 
-@router.delete("/climbers/{climber_id}", response_model=dict, tags=["Climbers"])
-async def delete_climber(climber_id: int, db: Session = Depends(get_db)):
+@router.delete("/climbers/{climber_id}",dependencies=[Depends(security)], response_model=dict, tags=["Climbers"])
+async def delete_climber(request: Request, climber_id: int, db: Session = Depends(get_db)):
     """Endpoint pour supprimer un grimpeur."""
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
+    user_id = token.get("user_id")
     if climber_service.delete_climber(db, climber_id):
         return {"message": "Climber deleted successfully"}
     raise HTTPException(status_code=404, detail="Climber not found")
