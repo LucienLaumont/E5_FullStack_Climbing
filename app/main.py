@@ -49,10 +49,10 @@ app.add_middleware(
 )
 
 # Inclure les routers
+app.include_router(routers.UserRouter)
 app.include_router(routers.ClimberRouter)
 app.include_router(routers.RouteRouter)
 app.include_router(routers.HealthRouter)
-
 # Middleware Prometheus
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)

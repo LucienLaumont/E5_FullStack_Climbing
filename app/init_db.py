@@ -22,7 +22,7 @@ def init_db():
         for _, row in user_data.iterrows():
             user = User(
                 username=row['username'],
-                password=row['password']  # Mot de passe simple
+                password=row['password']
             )
             db.add(user)
             db.commit()  # Commit chaque utilisateur pour générer leur ID
