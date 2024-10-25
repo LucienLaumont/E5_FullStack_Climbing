@@ -1,0 +1,45 @@
+@font-face {
+    font-family: 'Gliker';
+    src: url('../assets/fonts/Gliker.ttf') format('truetype'); /* Chemin mis à jour */
+  }
+  
+  body {
+    font-family: 'Gliker', sans-serif;
+  }
+  
+  .full-screen-image {
+    width: 100vw;
+    height: 99vh;
+    object-fit: cover;
+    position: relative;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 35vh;
+    left: 36vw;
+    display: flex;
+    flex-direction: column;
+    gap: 3vh;
+    z-index: 1;
+  }
+  
+  .clickable-block {
+    width: 22vw;
+    height: 16vh;
+    background-color: #226d68;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 4vh;
+    font-size: 3vh;
+    font-family: 'Gliker', sans-serif;
+  }
+  
+  .clickable-block:hover {
+    background-color: #668170;
+  }
+  

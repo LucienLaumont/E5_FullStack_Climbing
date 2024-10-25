@@ -113,25 +113,79 @@ def get_climbers_by_age(db: Session, min_age: int = 55, max_age: Optional[int] =
 #############################################################################################
 #############################################################################################
 
-def get_climbers_by_country(db: Session, min_age: int = None, max_age: int = None, sex: str = None):
-    # Créer la requête de base
-    query = db.query(models.Climber.country, func.count(models.Climber.climber_id).label('count'))
+def get_climbers_by_genders(db: Session,max_age: int = None):
+    # Créer la requête de base pour compter les hommes et les femmes
+    query = db.query(models.Climber.sex, func.count(models.Climber.climber_id).label('count'))
 
-    # Appliquer les filtres si fournis
-    if min_age is not None:
-        query = query.filter(models.Climber.age >= min_age)
+    # Appliquer les filtres sur l'âge si fournis
     if max_age is not None:
         query = query.filter(models.Climber.age <= max_age)
-    if sex is not None:
-        query = query.filter(models.Climber.sex == sex)
 
-    # Grouper les grimpeurs par pays
-    query = query.group_by(models.Climber.country)
+    # Grouper les résultats par sexe
+    query = query.group_by(models.Climber.sex)
 
     # Exécuter la requête et obtenir les résultats
     results = query.all()
 
     # Transformer les résultats en un dictionnaire pour l'API
-    data = {country: count for country, count in results}
+    data = {sex: count for sex, count in results}
 
     return data
+
+def get_climbers_by_experience(db: Session, max_age: int):
+    """
+    Retourne la répartition des grimpeurs par tranches d'années d'expérience
+    en fonction de l'âge maximum.
+    
+    Tranches d'expérience :
+    - 0-2 ans
+    - 3-5 ans
+    - 6-10 ans
+    - 10+ ans
+    """
+    # Initialisation des tranches d'expérience
+    experience_buckets = {
+        "0-2 ans": 0,
+        "3-5 ans": 0,
+        "6-10 ans": 0,
+        "10+ ans": 0,
+    }
+    
+    # Requête pour récupérer les grimpeurs dont l'âge est inférieur ou égal à l'âge max
+    climbers = db.query(models.Climber).filter(models.Climber.age <= max_age).all()
+
+    # Parcourir les grimpeurs et les classer dans les tranches d'années d'expérience
+    for climber in climbers:
+        if climber.years_cl <= 2:
+            experience_buckets["0-2 ans"] += 1
+        elif 3 <= climber.years_cl <= 5:
+            experience_buckets["3-5 ans"] += 1
+        elif 6 <= climber.years_cl <= 10:
+            experience_buckets["6-10 ans"] += 1
+        else:
+            experience_buckets["10+ ans"] += 1
+    
+    return experience_buckets
+
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from models import Climber  # Assurez-vous que Climber est bien importé depuis models
+
+def get_climbers_by_countries(db: Session, max_age: int, limit: int):
+    """
+    Retourne la répartition des grimpeurs par pays (max 5 pays),
+    filtrée par l'âge maximum spécifié.
+    """
+    # Requête pour obtenir le nombre de grimpeurs par pays, filtré par l'âge maximum
+    country_counts = (
+        db.query(Climber.country, func.count(Climber.climber_id).label("count"))
+        .filter(Climber.age <= max_age)
+        .group_by(Climber.country)
+        .order_by(func.count(Climber.climber_id).desc())  # Trier par nombre de grimpeurs
+        .limit(limit)  # Limiter à 5 pays
+        .all()
+    )
+
+    # Conversion du résultat en dictionnaire { 'Pays': nombre_grimpeurs }
+    result = {country: count for country, count in country_counts}
+    return result

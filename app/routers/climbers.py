@@ -97,6 +97,22 @@ async def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session 
 #############################################################################################
 #############################################################################################
 
-@router.get("/PieChart_Climbers/",response_model=dict,tags=["Dashboard"])
-async def get_climbers_by_country(db: Session = Depends(get_db), min_age: int = Query(None), max_age: int = Query(None), sex: str = Query(None)):
-    return climber_service.get_climbers_by_country(db,min_age,max_age,sex)
+@router.get("/PieChart_Climbers_Genders/",response_model=dict,tags=["Dashboard"])
+async def get_climbers_by_genders(db: Session = Depends(get_db), max_age: int = Query(None)):
+    return climber_service.get_climbers_by_genders(db,max_age)
+
+@router.get("/PieChart_Climbers_Experience/", response_model=dict, tags=["Dashboard"])
+async def get_climbers_by_experience(db: Session = Depends(get_db), max_age: int = Query(None)):
+    """
+    Retourne la répartition des grimpeurs par tranches d'années d'expérience
+    en fonction de l'âge maximum.
+    """
+    return climber_service.get_climbers_by_experience(db, max_age)
+
+@router.get("/PieChart_Climbers_Countries/", response_model=dict, tags=["Dashboard"])
+async def get_climbers_by_countries(db: Session = Depends(get_db), max_age: int = Query(None), limit: int = 5):
+    """
+    Retourne la répartition des grimpeurs par pays, limitée à 5 pays maximum,
+    en fonction de l'âge maximum spécifié.
+    """
+    return climber_service.get_climbers_by_countries(db, max_age, limit)
