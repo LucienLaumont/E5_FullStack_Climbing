@@ -109,3 +109,29 @@ def get_climbers_by_age(db: Session, min_age: int = 55, max_age: Optional[int] =
     return query.all()
 
 
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
+def get_climbers_by_country(db: Session, min_age: int = None, max_age: int = None, sex: str = None):
+    # Créer la requête de base
+    query = db.query(models.Climber.country, func.count(models.Climber.climber_id).label('count'))
+
+    # Appliquer les filtres si fournis
+    if min_age is not None:
+        query = query.filter(models.Climber.age >= min_age)
+    if max_age is not None:
+        query = query.filter(models.Climber.age <= max_age)
+    if sex is not None:
+        query = query.filter(models.Climber.sex == sex)
+
+    # Grouper les grimpeurs par pays
+    query = query.group_by(models.Climber.country)
+
+    # Exécuter la requête et obtenir les résultats
+    results = query.all()
+
+    # Transformer les résultats en un dictionnaire pour l'API
+    data = {country: count for country, count in results}
+
+    return data

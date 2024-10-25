@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -89,7 +89,7 @@ async def get_climbers_by_weight(min_weight: float = 90, max_weight: float = 100
     return climber_service.get_climbers_by_weight(db, min_weight, max_weight)
 
 @router.get("/climbers/filter_age/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depends(get_db)):
+async def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depends(get_db)):
     """Endpoint pour obtenir les grimpeurs filtrés par leur âge."""
     return climber_service.get_climbers_by_age(db, min_age, max_age)
 
@@ -97,4 +97,6 @@ def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depe
 #############################################################################################
 #############################################################################################
 
-
+@router.get("/PieChart_Climbers/",response_model=dict,tags=["Dashboard"])
+async def get_climbers_by_country(db: Session = Depends(get_db), min_age: int = Query(None), max_age: int = Query(None), sex: str = Query(None)):
+    return climber_service.get_climbers_by_country(db,min_age,max_age,sex)
