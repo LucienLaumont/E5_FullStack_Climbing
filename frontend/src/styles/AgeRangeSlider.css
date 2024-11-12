@@ -1,0 +1,40 @@
+.age-range-slider {
+    width: 100%; /* Prend toute la largeur de la section où il est utilisé */
+  }
+  
+  .slider-container {
+    width: 100%; /* Prend toute la largeur du conteneur parent */
+  }
+  
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #ddd;
+    outline: none;
+    border-radius: 5px;
+  }
+  
+  /* Curseur personnalisé pour Webkit (Chrome, Safari, etc.) */
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 50px; /* Taille du curseur */
+    height: 50px;
+    background: url('../assets/cursor.png'); /* Image du curseur */
+    background-size: contain; /* Ajuste l'image au curseur */
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Curseur personnalisé pour Firefox */
+  .slider::-moz-range-thumb {
+    width: 50px;
+    height: 50px;
+    background: url('../assets/cursor.png');
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+  }
+  

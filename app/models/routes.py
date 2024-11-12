@@ -1,4 +1,6 @@
-from sqlalchemy import Column, String, Integer, Float
+from sqlalchemy import Column, String, Integer, DateTime, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 from database import BaseSQL
 
 class Route(BaseSQL):

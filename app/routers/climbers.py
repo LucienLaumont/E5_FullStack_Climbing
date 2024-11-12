@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import schemas
 from models import get_db
 import services.climbers as climber_service
+from starlette.requests import Request
+from routers.utils import verify_autorization_header
 
 router = APIRouter()
 
@@ -23,22 +25,28 @@ async def get_climber_by_id(climber_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Climber not found")
     return climber
 
-@router.post("/climbers/", response_model=schemas.Climber, tags=["Climbers"])
-async def create_climber(climber: schemas.Climber, db: Session = Depends(get_db)):
+@router.post("/climbers/",dependencies=[Depends(security)], response_model=schemas.Climber, tags=["Climbers"])
+async def create_climber(request: Request, climber: schemas.Climber, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
     """Endpoint pour ajouter un nouveau grimpeur."""
     return climber_service.create_climber(db, climber)
 
-@router.put("/climbers/{climber_id}", response_model=schemas.Climber, tags=["Climbers"])
-async def update_climber(climber_id: int, updated_data: schemas.Climber, db: Session = Depends(get_db)):
+@router.put("/climbers/{climber_id}",dependencies=[Depends(security)], response_model=schemas.Climber, tags=["Climbers"])
+async def update_climber(request: Request, climber_id: int, updated_data: schemas.Climber, db: Session = Depends(get_db)):
     """Endpoint pour mettre à jour un grimpeur existant."""
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
     climber = climber_service.update_climber(db, climber_id, updated_data)
     if not climber:
         raise HTTPException(status_code=404, detail="Climber not found")
     return climber
 
-@router.delete("/climbers/{climber_id}", response_model=dict, tags=["Climbers"])
-async def delete_climber(climber_id: int, db: Session = Depends(get_db)):
+@router.delete("/climbers/{climber_id}",dependencies=[Depends(security)], response_model=dict, tags=["Climbers"])
+async def delete_climber(request: Request, climber_id: int, db: Session = Depends(get_db)):
     """Endpoint pour supprimer un grimpeur."""
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
     if climber_service.delete_climber(db, climber_id):
         return {"message": "Climber deleted successfully"}
     raise HTTPException(status_code=404, detail="Climber not found")
@@ -78,7 +86,7 @@ async def get_climbers_by_weight(min_weight: float = 90, max_weight: float = 100
     return climber_service.get_climbers_by_weight(db, min_weight, max_weight)
 
 @router.get("/climbers/filter_age/", response_model=List[schemas.Climber], tags=["Climbers"])
-def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depends(get_db)):
+async def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depends(get_db)):
     """Endpoint pour obtenir les grimpeurs filtrés par leur âge."""
     return climber_service.get_climbers_by_age(db, min_age, max_age)
 
@@ -86,4 +94,30 @@ def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session = Depe
 #############################################################################################
 #############################################################################################
 
+@router.get("/BarChart_Climbers_Genders/",response_model=dict,tags=["Dashboard"])
+async def get_climbers_by_genders(db: Session = Depends(get_db), max_age: int = Query(None)):
+    return climber_service.get_climbers_by_genders(db,max_age)
 
+@router.get("/PieChart_Climbers_Experience/", response_model=dict, tags=["Dashboard"])
+async def get_climbers_by_experience(db: Session = Depends(get_db), max_age: int = Query(None)):
+    """
+    Retourne la répartition des grimpeurs par tranches d'années d'expérience
+    en fonction de l'âge maximum.
+    """
+    return climber_service.get_climbers_by_experience(db, max_age)
+
+@router.get("/PieChart_Climbers_Countries/", response_model=dict, tags=["Dashboard"])
+
+async def get_climbers_by_countries(db: Session = Depends(get_db), max_age: int = Query(None), limit: int = 6):
+    """
+    Retourne la répartition des grimpeurs par pays, limitée à 5 pays maximum,
+    en fonction de l'âge maximum spécifié.
+    """
+    return climber_service.get_climbers_by_countries(db, max_age, limit)
+
+@router.get("/scatterGradesByAge",tags=["Dashboard"])
+async def get_average_grades_by_age(db: Session = Depends(get_db), max_age: int = Query(None)):
+    """
+    Retourne les grades_max par âge en fonction de l'âge maximum spécifié.
+    """
+    return climber_service.get_grades_by_age(db, max_age)

@@ -1,8 +1,9 @@
 from pydantic import BaseModel
-from typing import Optional
+from uuid import UUID
 
 # Schéma de base pour les routes (voies d'escalade)
 class RouteBase(BaseModel):
+    name_id: int 
     country: str
     crag: str  # Site d'escalade
     sector: str  # Secteur d'escalade
@@ -18,7 +19,6 @@ class RouteCreate(RouteBase):
 
 # Schéma pour la réponse avec l'ID de la route
 class Route(RouteBase):
-    name_id: int  # Identifiant de la voie
 
     class Config:
         orm_mode = True

@@ -11,5 +11,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier tout le contenu de l'application dans le conteneur
 COPY . /app
 
-# Exécuter le script d'initialisation de la base de données et lancer l'API
+# Exécuter le script d'initialisation de la base de données et lancer l'API avec rechargement
 CMD ["sh", "-c", "python /app/init_db.py && uvicorn main:app --host 0.0.0.0 --port 5000 --reload"]

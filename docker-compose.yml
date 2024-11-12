@@ -10,7 +10,7 @@ services:
     networks:
       - default
     volumes:
-      - ./app:/app
+      - ./app:/app                          # Monte les fichiers locaux dans le conteneur API
     ports:
       - "5000:5000"
     env_file:
@@ -36,8 +36,8 @@ services:
     networks:
       - default
     volumes:
-      - ./frontend:/app               # Monter les fichiers locaux pour le développement
-      - /app/node_modules              # Volume séparé pour node_modules
+      - ./frontend:/app                     # Monte les fichiers locaux pour le développement frontend
+      - /app/node_modules                   # Garde node_modules dans un volume séparé pour éviter les problèmes de permissions
     ports:
       - "3000:3000"
     depends_on:

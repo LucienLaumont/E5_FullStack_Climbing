@@ -11,9 +11,9 @@ def get_all_climbers(db: Session, skip: int = 0, limit: int = 10) -> List[models
     records = db.query(models.Climber).offset(skip).limit(limit).all()
     return records
 
-def get_climber_by_id(db: Session, user_id: int) -> models.Climber:
+def get_climber_by_id(db: Session, climber_id: int) -> models.Climber:
     """Obtenir une route par son identifiant (name_id)."""
-    record = db.query(models.Climber).filter(models.Climber.user_id == user_id).first()
+    record = db.query(models.Climber).filter(models.Climber.climber_id == climber_id).first()
     return record
 
 def create_climber(db: Session, climber: schemas.Climber) -> models.Climber:
@@ -25,30 +25,15 @@ def create_climber(db: Session, climber: schemas.Climber) -> models.Climber:
     return db_climber
 
 def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) -> models.Climber:
-    """Mettre à jour un grimpeur existant dans la base de données."""
-    db_climber = db.query(models.Climber).filter(models.Climber.user_id == climber_id).first()
-
-    if db_climber:
-        updated_data_dict = updated_data.dict(exclude_unset=True)  # Seuls les champs avec des valeurs
-        for key, value in updated_data_dict.items():
-            setattr(db_climber, key, value)  # Met à jour chaque attribut de manière dynamique
-        
-        db.commit()
-        db.refresh(db_climber)
-        return db_climber
-    else:
-        return None
-
-def update_climber(db: Session, climber_id: int, updated_data: schemas.Climber) -> models.Climber:
     """Mettre à jour un grimpeur existant en une seule ligne."""
-    db.query(models.Climber).filter(models.Climber.user_id == climber_id).update(updated_data.dict(exclude_unset=True))
+    db.query(models.Climber).filter(models.Climber.climber_id == climber_id).update(updated_data.dict(exclude_unset=True))
     db.commit()
-    db_climber = db.query(models.Climber).filter(models.Climber.user_id == climber_id).first()
+    db_climber = db.query(models.Climber).filter(models.Climber.climber_id == climber_id).first()
     return db_climber
 
 def delete_climber(db: Session, user_id: int) -> bool:
     """Supprimer une route de la base de données."""
-    db_user = db.query(models.Climber).filter(models.Climber.user_id == user_id).first()
+    db_user = db.query(models.Climber).filter(models.Climber.climber_id == user_id).first()
 
     if db_user:
         db.delete(db_user)
@@ -124,3 +109,94 @@ def get_climbers_by_age(db: Session, min_age: int = 55, max_age: Optional[int] =
     return query.all()
 
 
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
+def get_climbers_by_genders(db: Session,max_age: int = None):
+    # Créer la requête de base pour compter les hommes et les femmes
+    query = db.query(models.Climber.sex, func.count(models.Climber.climber_id).label('count'))
+
+    # Appliquer les filtres sur l'âge si fournis
+    if max_age is not None:
+        query = query.filter(models.Climber.age <= max_age)
+
+    # Grouper les résultats par sexe
+    query = query.group_by(models.Climber.sex)
+
+    # Exécuter la requête et obtenir les résultats
+    results = query.all()
+
+    # Transformer les résultats en un dictionnaire pour l'API
+    data = {sex: count for sex, count in results}
+
+    return data
+
+def get_climbers_by_experience(db: Session, max_age: int):
+    """
+    Retourne la répartition des grimpeurs par tranches d'années d'expérience
+    en fonction de l'âge maximum.
+    
+    Tranches d'expérience :
+    - 0-2 ans
+    - 3-5 ans
+    - 6-10 ans
+    - 10+ ans
+    """
+    # Initialisation des tranches d'expérience
+    experience_buckets = {
+        "0-2 ans": 0,
+        "3-5 ans": 0,
+        "6-10 ans": 0,
+        "10+ ans": 0,
+    }
+    
+    # Requête pour récupérer les grimpeurs dont l'âge est inférieur ou égal à l'âge max
+    climbers = db.query(models.Climber).filter(models.Climber.age <= max_age).all()
+
+    # Parcourir les grimpeurs et les classer dans les tranches d'années d'expérience
+    for climber in climbers:
+        if climber.years_cl <= 2:
+            experience_buckets["0-2 ans"] += 1
+        elif 3 <= climber.years_cl <= 5:
+            experience_buckets["3-5 ans"] += 1
+        elif 6 <= climber.years_cl <= 10:
+            experience_buckets["6-10 ans"] += 1
+        else:
+            experience_buckets["10+ ans"] += 1
+    
+    return experience_buckets
+
+def get_climbers_by_countries(db: Session, max_age: int, limit: int):
+    """
+    Retourne la répartition des grimpeurs par pays (max 5 pays),
+    filtrée par l'âge maximum spécifié.
+    """
+    # Requête pour obtenir le nombre de grimpeurs par pays, filtré par l'âge maximum
+    country_counts = (
+        db.query(models.Climber.country, func.count(models.Climber.climber_id).label("count"))
+        .filter(models.Climber.age <= max_age)
+        .group_by(models.Climber.country)
+        .order_by(func.count(models.Climber.climber_id).desc())  # Trier par nombre de grimpeurs
+        .limit(limit)  # Limiter à 5 pays
+        .all()
+    )
+
+    # Conversion du résultat en dictionnaire { 'Pays': nombre_grimpeurs }
+    result = {country: count for country, count in country_counts}
+    return result
+
+def get_grades_by_age(db: Session, max_age: int):
+    """
+    Retourne la moyenne des grades maximum par âge des grimpeurs, filtrés par un âge maximum.
+    """
+    # Requête pour calculer la moyenne des grades_max pour chaque âge
+    grades_by_age = (
+        db.query(models.Climber.age, func.avg(models.Climber.grades_max).label("average_grade_max"))
+        .filter(models.Climber.age <= max_age)
+        .group_by(models.Climber.age)
+        .all()
+    )
+
+    # Retourne les résultats sous forme de liste de dicts [{'age': age, 'average_grade_max': avg_grade}]
+    return [{"age": age, "average_grade_max": average_grade_max} for age, average_grade_max in grades_by_age]
