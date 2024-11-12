@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from typing import List
 import schemas
 from models import get_db
 import services.routes as route_service
+from starlette.requests import Request
+from routers.utils import verify_autorization_header
 
 router = APIRouter()
+
+security = HTTPBearer()
 
 @router.get("/routes/", response_model=List[schemas.Route], tags=["Routes"])
 async def get_all_routes(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
@@ -20,22 +25,28 @@ async def get_route_by_id(name_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Route not found")
     return route
 
-@router.post("/routes/", response_model=schemas.Route, tags=["Routes"])
-async def create_route(route: schemas.RouteCreate, db: Session = Depends(get_db)):
+@router.post("/routes/",dependencies=[Depends(security)], response_model=schemas.Route, tags=["Routes"])
+async def create_route(request: Request,route: schemas.RouteCreate, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
     """Endpoint pour ajouter une nouvelle route."""
     return route_service.create_route(db, route)
 
-@router.put("/routes/{name_id}", response_model=schemas.Route, tags=["Routes"])
-async def update_route(name_id: int, updated_data: schemas.RouteCreate, db: Session = Depends(get_db)):
+@router.put("/routes/{name_id}",dependencies=[Depends(security)], response_model=schemas.Route, tags=["Routes"])
+async def update_route(request: Request,name_id: int, updated_data: schemas.RouteCreate, db: Session = Depends(get_db)):
     """Endpoint pour mettre à jour une route existante."""
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
     route = route_service.update_route(db, name_id, updated_data)
     if route is None:
         raise HTTPException(status_code=404, detail="Route not found")
     return route
 
-@router.delete("/routes/{name_id}", response_model=dict, tags=["Routes"])
-async def delete_route(name_id: int, db: Session = Depends(get_db)):
+@router.delete("/routes/{name_id}",dependencies=[Depends(security)], response_model=dict, tags=["Routes"])
+async def delete_route(request: Request,name_id: int, db: Session = Depends(get_db)):
     """Endpoint pour supprimer une route."""
+    auth_header = request.headers.get("Authorization")
+    token = verify_autorization_header(auth_header)
     if route_service.delete_route(db, name_id):
         return {"message": "Route deleted successfully"}
     raise HTTPException(status_code=404, detail="Route not found")

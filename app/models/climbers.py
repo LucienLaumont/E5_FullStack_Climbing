@@ -24,11 +24,5 @@ class Climber(BaseSQL):
     year_first = Column(Integer, nullable=False)
     year_last = Column(Integer, nullable=False)
 
-    # Clé étrangère qui fait référence à la table users
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
-
-    # Définir la relation avec le modèle User
-    user = relationship("User", back_populates="climbers")
-
     class Config:
         orm_mode = True

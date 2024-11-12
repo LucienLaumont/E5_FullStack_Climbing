@@ -1,6 +1,8 @@
 .dashboard-container {
-  width: 90%;
-  margin: 0 auto;
+  width: 95%;
+  height: 95%;
+  position: absolute;
+  overflow: hidden;
 }
 
 .header-container {
@@ -11,8 +13,8 @@
   border: 2px solid black;
   border-radius: 3vh;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Titre à gauche, slider à droite */
+  align-items: center; /* Centre verticalement les deux sections */
 }
 
 .dashboard-title {
@@ -22,16 +24,31 @@
 
 .slider-section {
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Empile h3 et le slider */
+  align-items: center; /* Centre horizontalement le contenu */
+  justify-content: center; /* Centre le contenu verticalement */
+  font-size: 1.5em;
+  height: 100%; /* Assure que la div occupe toute la hauteur pour l'alignement */
 }
 
 .slider-section h3 {
-  margin-right: 20px;
+  margin: 0 0 10px 0; /* Ajoute un espace entre le texte et le slider */
 }
 
-.slider-section .age-value {
-  margin-left: 20px;
-  font-size: 1.2em;
+.slider {
+  display: flex;
+  align-items: center; /* Aligne le slider si besoin */
+}
+
+.line {
+  margin-top: 20px;
+  display: flex; /* Utilise Flexbox pour aligner les éléments horizontalement */
+  align-items: stretch; /* Étire tous les éléments pour qu'ils aient la même hauteur */
+  gap: 20px; /* Ajoute un espace entre les éléments */
+  width: 100%; /* Assure que la ligne prend toute la largeur disponible */
+  box-sizing: border-box;
+  justify-content: space-between;
+  height: 49%; /* Ajuste la hauteur de la ligne */
 }
 
 .pie-charts-container {
@@ -43,25 +60,73 @@
 }
 
 .pie-chart-container {
-  flex-grow: 1;
-  min-width: 32%;
-  max-width: 32%;
+  display: flex;               /* Active Flexbox */
+  justify-content: center;      /* Centre horizontalement le contenu */
+  align-items: center;          /* Centre verticalement le contenu */
+  flex-direction: column;       /* Empile les éléments verticalement */
+  flex-grow: 1;                 /* Permet au conteneur de s'étendre */
   border: 2px solid black;
   border-radius: 4vh;
   background-color: #333;
   padding: 10px;
   box-sizing: border-box;
+  text-align: center;           /* Centre le texte (s'il y en a) */
+}
+
+.scatter-plot-container {
+  flex-grow: 1;
+  border: 2px solid black;
+  border-radius: 4vh;
+  background-color: #333;
+  padding: 10px;
+  box-sizing: border-box;
+  color: white;
+  display: flex;
+}
+
+.scatter-plot {
+  position: center;
+  height: 80%;
+  width: 98%;
+  flex-direction: column; /* Permet d'empiler le titre et le graphique */
+  justify-content: center;
+  align-items: center;
   text-align: center;
 }
 
-@media (max-width: 768px) {
-  .pie-charts-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .pie-chart-container {
-    width: 100%;
-    margin-bottom: 20px;
-  }
+.bar-chart-container {
+  height: 70%;
+  width: 60%;
+  flex-grow: 1;
+  border: 2px solid black;
+  border-radius: 4vh;
+  background-color: #333;
+  padding: 10px;
+  box-sizing: border-box;
+  color: white;
+  display: flex;
 }
+
+.bar-chart {
+  position: center;
+  height: 70%;
+  width: 90%;
+  flex-direction: column; /* Permet d'empiler le titre et le graphique */
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.source-link {
+  height: 70%;
+  width: 20%;
+  flex-grow: 1;
+  border: 2px solid black;
+  border-radius: 4vh;
+  background-color: #333;
+  padding: 10px;
+  box-sizing: border-box;
+  color: white;
+  display: flex;
+}
+

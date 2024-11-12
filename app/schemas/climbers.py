@@ -1,8 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
-# Schéma pour les données de grimpeurs (Climbers)
 class ClimberBase(BaseModel):
     climber_id: int
     country: str
@@ -21,13 +20,10 @@ class ClimberBase(BaseModel):
     year_first: int
     year_last: int
 
-# Schéma pour la création de grimpeurs
 class ClimberCreate(ClimberBase):
-    user_id: int
+    pass
 
-# Schéma pour la réponse avec l'ID de l'utilisateur
 class Climber(ClimberBase):
-    user_id: int
     
     class Config:
         orm_mode = True

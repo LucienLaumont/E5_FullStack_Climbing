@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from uuid import UUID
 
 # Schéma de base pour les routes (voies d'escalade)
 class RouteBase(BaseModel):
@@ -15,11 +15,10 @@ class RouteBase(BaseModel):
 
 # Schéma pour la création d'une nouvelle route
 class RouteCreate(RouteBase):
-    user_id: int
+    pass
 
 # Schéma pour la réponse avec l'ID de la route
 class Route(RouteBase):
-    user_id: int
 
     class Config:
         orm_mode = True

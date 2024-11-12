@@ -167,10 +167,6 @@ def get_climbers_by_experience(db: Session, max_age: int):
     
     return experience_buckets
 
-from sqlalchemy.orm import Session
-from sqlalchemy import func
-from models import Climber  # Assurez-vous que Climber est bien importé depuis models
-
 def get_climbers_by_countries(db: Session, max_age: int, limit: int):
     """
     Retourne la répartition des grimpeurs par pays (max 5 pays),
@@ -178,10 +174,10 @@ def get_climbers_by_countries(db: Session, max_age: int, limit: int):
     """
     # Requête pour obtenir le nombre de grimpeurs par pays, filtré par l'âge maximum
     country_counts = (
-        db.query(Climber.country, func.count(Climber.climber_id).label("count"))
-        .filter(Climber.age <= max_age)
-        .group_by(Climber.country)
-        .order_by(func.count(Climber.climber_id).desc())  # Trier par nombre de grimpeurs
+        db.query(models.Climber.country, func.count(models.Climber.climber_id).label("count"))
+        .filter(models.Climber.age <= max_age)
+        .group_by(models.Climber.country)
+        .order_by(func.count(models.Climber.climber_id).desc())  # Trier par nombre de grimpeurs
         .limit(limit)  # Limiter à 5 pays
         .all()
     )
@@ -189,3 +185,18 @@ def get_climbers_by_countries(db: Session, max_age: int, limit: int):
     # Conversion du résultat en dictionnaire { 'Pays': nombre_grimpeurs }
     result = {country: count for country, count in country_counts}
     return result
+
+def get_grades_by_age(db: Session, max_age: int):
+    """
+    Retourne la moyenne des grades maximum par âge des grimpeurs, filtrés par un âge maximum.
+    """
+    # Requête pour calculer la moyenne des grades_max pour chaque âge
+    grades_by_age = (
+        db.query(models.Climber.age, func.avg(models.Climber.grades_max).label("average_grade_max"))
+        .filter(models.Climber.age <= max_age)
+        .group_by(models.Climber.age)
+        .all()
+    )
+
+    # Retourne les résultats sous forme de liste de dicts [{'age': age, 'average_grade_max': avg_grade}]
+    return [{"age": age, "average_grade_max": average_grade_max} for age, average_grade_max in grades_by_age]

@@ -33,7 +33,6 @@ def init_db():
 
         # Associer chaque grimpeur à un utilisateur existant (aléatoirement ici)
         for i, row in climber_data.iterrows():
-            user = users[i % len(users)]  # Associer un utilisateur cycliquement
             climber = Climber(
                 climber_id=row['user_id'],
                 country=row['country'],
@@ -51,7 +50,6 @@ def init_db():
                 grades_mean=row['grades_mean'],
                 year_first=row['year_first'],
                 year_last=row['year_last'],
-                user_id=user.id  # Associer l'utilisateur au grimpeur
             )
             db.add(climber)
 

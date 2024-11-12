@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../styles/AgeRangeSlider.css'; // Assurez-vous que le chemin est correct
 
 function AgeRangeSlider({ setAgeMax }) {
-  const [ageMax, setLocalAgeMax] = useState(70);
+  const [ageMax, setLocalAgeMax] = useState(30);
 
   const handleMaxChange = (event) => {
     const value = Number(event.target.value);

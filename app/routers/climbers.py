@@ -29,7 +29,6 @@ async def get_climber_by_id(climber_id: int, db: Session = Depends(get_db)):
 async def create_climber(request: Request, climber: schemas.Climber, db: Session = Depends(get_db)):
     auth_header = request.headers.get("Authorization")
     token = verify_autorization_header(auth_header)
-    user_id = token.get("user_id")
     """Endpoint pour ajouter un nouveau grimpeur."""
     return climber_service.create_climber(db, climber)
 
@@ -38,7 +37,6 @@ async def update_climber(request: Request, climber_id: int, updated_data: schema
     """Endpoint pour mettre à jour un grimpeur existant."""
     auth_header = request.headers.get("Authorization")
     token = verify_autorization_header(auth_header)
-    user_id = token.get("user_id")
     climber = climber_service.update_climber(db, climber_id, updated_data)
     if not climber:
         raise HTTPException(status_code=404, detail="Climber not found")
@@ -49,7 +47,6 @@ async def delete_climber(request: Request, climber_id: int, db: Session = Depend
     """Endpoint pour supprimer un grimpeur."""
     auth_header = request.headers.get("Authorization")
     token = verify_autorization_header(auth_header)
-    user_id = token.get("user_id")
     if climber_service.delete_climber(db, climber_id):
         return {"message": "Climber deleted successfully"}
     raise HTTPException(status_code=404, detail="Climber not found")
@@ -97,7 +94,7 @@ async def get_climbers_by_age(min_age: int = 55, max_age: int = 58, db: Session 
 #############################################################################################
 #############################################################################################
 
-@router.get("/PieChart_Climbers_Genders/",response_model=dict,tags=["Dashboard"])
+@router.get("/BarChart_Climbers_Genders/",response_model=dict,tags=["Dashboard"])
 async def get_climbers_by_genders(db: Session = Depends(get_db), max_age: int = Query(None)):
     return climber_service.get_climbers_by_genders(db,max_age)
 
@@ -110,9 +107,17 @@ async def get_climbers_by_experience(db: Session = Depends(get_db), max_age: int
     return climber_service.get_climbers_by_experience(db, max_age)
 
 @router.get("/PieChart_Climbers_Countries/", response_model=dict, tags=["Dashboard"])
-async def get_climbers_by_countries(db: Session = Depends(get_db), max_age: int = Query(None), limit: int = 5):
+
+async def get_climbers_by_countries(db: Session = Depends(get_db), max_age: int = Query(None), limit: int = 6):
     """
     Retourne la répartition des grimpeurs par pays, limitée à 5 pays maximum,
     en fonction de l'âge maximum spécifié.
     """
     return climber_service.get_climbers_by_countries(db, max_age, limit)
+
+@router.get("/scatterGradesByAge",tags=["Dashboard"])
+async def get_average_grades_by_age(db: Session = Depends(get_db), max_age: int = Query(None)):
+    """
+    Retourne les grades_max par âge en fonction de l'âge maximum spécifié.
+    """
+    return climber_service.get_grades_by_age(db, max_age)
