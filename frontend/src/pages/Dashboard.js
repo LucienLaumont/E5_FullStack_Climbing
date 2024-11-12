@@ -14,6 +14,7 @@ import {
   CategoryScale // Pour les barres
 } from 'chart.js';
 import '../styles/Dashboard.css';
+import climber from '../assets/climbing.png';
 
 // Enregistrement des composants Chart.js nécessaires pour le bar chart
 ChartJS.register(ArcElement, Tooltip, Legend, PointElement, LinearScale, Title, BarElement, CategoryScale);
@@ -267,8 +268,9 @@ function Dashboard() {
             <Bar data={barChartData} options={barChartOptions} />
           </div>
         </div>
-        <div className="source-link">
-          <h2>Source</h2>
+        <div className="climber-box">
+          <img src={climber} className='climber-image'>
+          </img>
         </div>
       </div>
     </div>

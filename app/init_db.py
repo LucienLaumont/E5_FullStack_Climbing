@@ -58,7 +58,6 @@ def init_db():
 
         # Ajouter les routes à la base de données
         for _, row in route_data.iterrows():
-            user = users[i % len(users)]  # Associer un utilisateur cycliquement
             route = Route(
                 name_id=row['name_id'],
                 country=row['country'],
@@ -68,8 +67,7 @@ def init_db():
                 tall_recommend_sum=row['tall_recommend_sum'],
                 grade_mean=row['grade_mean'],
                 cluster=row['cluster'],
-                rating_tot=row['rating_tot'],
-                user_id=user.id  # Associer l'utilisateur au grimpeur
+                rating_tot=row['rating_tot']
             )
             db.add(route)
 
